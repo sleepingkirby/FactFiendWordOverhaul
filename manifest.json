@@ -5,7 +5,9 @@
   "description": "Fact Fiend/Untitled Side Channel asked for this. Replaces 'Woke' with 'challenging norms'",
   "permissions": [
     "storage",
-    "declarativeContent"
+    "declarativeContent",
+    "activeTab",
+    "tabs"
   ],
   "icons": {
     "96": "icons/placeholder_bow96.png"

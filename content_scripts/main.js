@@ -25,6 +25,49 @@ function runOnURL(url,on,wl,bl){
 return false;
 }
 
+//determins which 
+function whichCap(word){
+  
+}
+
+/*----------------------------------------------
+pre: none
+post: elements replaced
+goes through all the elements and runs the replace
+----------------------------------------------*/
+function runReplace(allEls, words){
+    allObjs.forEach((el) => {
+    let txt=el.innerText;
+      if(txt){
+      //do replace.
+        Object.keys(sttngs.words).forEach((word) => {
+        //regex search
+        txt.replace
+        //determine case
+        //
+        });
+      }
+    }); 
+}
+
+/*----------------------------------------------
+pre: none
+post: runReplace()
+switch for what to run on message from popup
+----------------------------------------------*/
+function runOnMsg(request, sender, sendResponse){
+  switch(request.action){
+    case 'replace':
+      chrome.storage.local.get('words', (d) => {
+      console.log('FactFiendWordOverhaul: running manual replace');
+      runReplace(document.all, d['words']);
+      });
+    break;
+    default:
+    break;
+  }
+}
+
 
 //main run
   chrome.storage.local.get(null, (d) => {
@@ -57,19 +100,11 @@ return false;
 
     let allObjs=document.all;
 
-    allObjs.forEach((el) => {
-      if(el.innerText){
-      //do replace.
-        Object.keys(sttngs.words).forEach((word) => {
-        //regex search
-        //determine case
-        //
-        });
-      }
-    });
+
+  runReplace(allObjs,sttngs.words);
+  chrome.storage.local.clear();
   });
 
-
-chrome.storage.local.clear();
-
+  //listener for the popup signal
+  chrome.runtime.onMessage.addListener(runOnMsg);
 })();
