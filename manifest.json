@@ -8,14 +8,11 @@
     "declarativeContent"
   ],
   "icons": {
-    "16": "icons/logo16.png",
-    "64": "icons/logo64.png",
-    "96": "icons/logo96.png",
-    "128": "icons/logo128.png"
+    "96": "icons/placeholder_bow96.png"
   },
   "action": {
     "default_icon": {
-      "96":"icons/logo96.png"
+      "96":"icons/placeholder_bow96.png"
     },
     "default_title": "FactFiend Word Overhaul",
     "default_popup": "popup/menu.html"
