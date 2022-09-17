@@ -19,7 +19,6 @@
     "default_title": "FactFiend Word Overhaul",
     "default_popup": "popup/menu.html"
   },
-  "options_page": "options/settings.html",
   "content_scripts": [
     {
       "matches": ["<all_urls>"],

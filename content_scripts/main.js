@@ -30,7 +30,7 @@ function whichCap(word){
 let capLen=0;
 let capEnd=false;
   for(let i; i<3; i++){
-    if(/\p{Lu}/u.test(word[i]){
+    if(/\p{Lu}/u.test(word[i])){
     capLen++;
     }
   }

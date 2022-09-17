@@ -89,7 +89,7 @@ content: "on";
 
 .pageWrap{
 width: 100%;
-min-width: 200px;
+min-width: 300px;
 flex-direction: column;
 justify-content: center;
 align-items: stretch;
@@ -121,12 +121,39 @@ justify-content: space-between;
 justify-content: space-around;
 }
 
+.col{
+display: flex;
+flex-direction: column;
+justify-content: center;
+}
+
+.colLft{
+align-items: flex-start;
+}
+
+.colRght{
+align-items: flex-end;
+}
+
+.colFll{
+align-items: space-between;
+}
+
+.colCntr{
+align-items: space-around;
+}
+
 .lbl{
 border-radius: 4px;
 padding: 2px 4px 2px 4px;
+font-size: larger;
+font-weight: bolder;
 }
 
-.prflSlctDmn{
+.cmmnts{
+margin-left: 4px;
+font-size: x-small;
+font-weight: normal;
 }
 
 #dmnTypes > label{

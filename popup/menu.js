@@ -74,10 +74,10 @@ var act=null;
       case 'settingsPage':
       chrome.runtime.openOptionsPage();     
       break;
-      case 'donate':
-      chrome.tabs.create({url: 'https://b3spage.sourceforge.io/index.html?sara'});
+      case 'About':
+      chrome.tabs.create({url: 'https://www.patreon.com/untitledsidechannel'});
       break;
-      case 'btnFllId':
+      case 'replace':
       chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
         chrome.tabs.sendMessage(tabs[0].id, {action: 'fillForm', msg:{val:document.getElementById("prflSlct").value}});
       });
@@ -97,9 +97,9 @@ var act=null;
   var dmn="";
   act=e.target.getAttribute("act");
     switch(act){
-      case 'tglAtFll':
-        chrome.storage.local.get({"settings":null},(d)=>{
-          d.settings.autoFill=document.getElementById("atFllId").checked;
+      case 'updtOn':
+        chrome.storage.local.get({"on":null},(d)=>{
+          d.on=document.getElementById("rplChck").checked;
           chrome.storage.local.set(d);
         });
       break;
@@ -324,18 +324,26 @@ function chromeSendMsgErrHndl(action, tabs){
   }
 }
 
+function sttngsUpdtGUI(d){
+document.getElementById("rplChck").checked=d.on;
+}
 
 //================================ main ==========================
 var host=""
+/*
 var ignrHsh={};
 var applyHsh={};
 var curPrfl=null;
+*/
 
 //variable checks
 chrome.storage.local.get( null,(d) => {
-  
+console.log(d);  
+
+sttngsUpdtGUI(d);
 
 
+/*
 var af=document.getElementById("atFllId");
 af.checked=d.settings.autoFill;
 
@@ -350,12 +358,12 @@ hov.checked=d.settings.floatPnl;
 
 var curDef=document.getElementById("curDefId");
 curDef.checked=d.settings.curDef;
-
+*/
 
 //fill div with domain and the buttons that match
-getCurHost(populDmn, {id:"dmn", ignrId:"dmnTypeIgnr", applyId:"dmnTypeApply", "d":d});
+//getCurHost(populDmn, {id:"dmn", ignrId:"dmnTypeIgnr", applyId:"dmnTypeApply", "d":d});
 
-
+/*
   //figure out what profile to have in the profiles drop down as well as fill the drop down. 
   chrome.tabs.query({active: true, currentWindow: true},(tabs) => {
     if(tabs[0].url.indexOf("chrome")!=0){
@@ -371,7 +379,7 @@ getCurHost(populDmn, {id:"dmn", ignrId:"dmnTypeIgnr", applyId:"dmnTypeApply", "d
       });
     }
   });
-
+*/
 
 
 startListen();
