@@ -16,16 +16,17 @@
       <label act="tglAtFll" class="tgglBtn" for="rplChck">Auto Replace</label>
     </div>
 
-    <hr/>
+    <div id="curDmn" class="lbl" style="color: black; background-color: #888888; border:1px solid #888888;">&nbsp;</div>
     <div class="col colLft"> 
       <div class="lbl">black list</div>
       <div class="cmmnts">(doesn't run when "Auto Replace" is on)</div>
     </div>
     <div class="row rowLft">
-      <textarea id=""></textarea>
+      <textarea id="bLst" act="lghtBttn" for="bLstBttn"></textarea>
     </div>
-    <div class="row rowRght">
-      <button>save</button>
+    <div class="row rowFll">
+      <button id="bLstAddBttn" act="addToSttngs" prop="blacklist">add current domain</button>
+      <button id="bLstBttn" act="svTxtArea" txtArea="bLst" prop="blacklist">save</button>
     </div>
 
     <hr/>
@@ -34,10 +35,11 @@
       <div>(runs when "Auto Replace" is off)</div>
     </div>
     <div class="row rowLft">
-      <textarea id=""></textarea>
+      <textarea id="wLst" act="lghtBttn" for="wLstBttn"></textarea>
     </div>
-    <div class="row rowRght">
-      <button>save</button>
+    <div class="row rowFll">
+      <button id="wLstAddBttn" act="addToSttngs" prop="whitelist">add current domain</button>
+      <button id="wLstBttn" act="svTxtArea" txtArea="wLst" prop="whitelist">save</button>
     </div>
 
     <hr/>
@@ -45,10 +47,10 @@
       <div class="lbl">word list</div>
     </div>
     <div class="row rowLft">
-      <textarea id=""></textarea>
+      <textarea id="wrdLst" act="lghtBttn" for="wrdLstBttn"></textarea>
     </div>
     <div class="row rowRght">
-      <button>save</button>
+      <button id="wrdLstBttn">save</button>
     </div>
 
     <hr/>

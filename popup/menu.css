@@ -87,6 +87,12 @@ border-color:#ffffff;
 content: "on"; 
 }
 
+.onBttn{
+background-color: #31B0D5;
+color: #ffffff;
+border-color:#ffffff;
+}
+
 .pageWrap{
 width: 100%;
 min-width: 300px;

@@ -31,36 +31,6 @@ return rtrn;
 }
 
 
-/*--------------------------------------------------------------------
-pre: none
-post: fills select w/ "id" with options from arr,selected set to prf
-inParam: element id, array to fill, option to be selected
-fill out the select element
---------------------------------------------------------------------*/
-function fillSlct(id, arr, prf){
-  if(!id || id==""||typeof arr !="object" || Object.keys(arr) <= 0){
-  return 0;
-  }
-
-  var p=prf;
-  if(typeof p !="string"){
-  p=false;
-  }
-
-  var tmp=null;
-  var slct=document.getElementById(id);
-  slct.textContent=null;
-    for(let i of arr){
-    tmp=document.createElement("option");
-    tmp.innerText=i;
-    tmp.value=i;
-      if(p && i==p){
-      tmp.selected=true;
-      }
-    slct.appendChild(tmp);
-    }
-}
-
 /*---------------------------------------------------------------------
 pre: none 
 post: updates chrome.storage.local
@@ -91,31 +61,46 @@ var act=null;
       break;
     }
   });
+  document.addEventListener("key", (e) => {
+  const act=e.target.getAttribute("act");
+    switch(act){
+      default:
+      break;
+    }
+  });
+  document.addEventListener("click", (e) => {
+  const act=e.target.getAttribute("act");
+    switch(act){
+      case "svTxtArea":
+        const el=e.target;
+        const sttngObj={};
+        const prop=e.target.getAttribute("prop");
+        const taVal=document.getElementById(e.target.getAttribute('txtArea')).value;
+        sttngObj[prop]=null;
+          chrome.storage.local.get(sttngObj,(d)=>{
+          d[prop]=strToHsh(taVal);
+          console.log(d);
+            chrome.storage.local.set(d,()=>{
+            el.classList.remove("onBttn");
+            });
+          });
+      break;
+    }
+  });
   document.addEventListener("change", (e) => {
-  var obj={};
   var prfl="";
   var dmn="";
   act=e.target.getAttribute("act");
     switch(act){
       case 'updtOn':
         chrome.storage.local.get({"on":null},(d)=>{
-          d.on=document.getElementById("rplChck").checked;
-          chrome.storage.local.set(d);
-        });
-      break;
-      case 'tglEvntFll':
-        chrome.storage.local.get({"settings":null},(d)=>{
-          d.settings.eventFill=document.getElementById("evntFllId").checked;
-          chrome.storage.local.set(d);
-        });
-      break;
-      case "tglHvr":
-        chrome.storage.local.get({"settings":null},(d)=>{
-        d.settings.hoverId=e.target.checked;
+        d.on=document.getElementById("rplChck").checked;
         chrome.storage.local.set(d);
         });
       break;
-      //this is when the drop down in the popup for profiles is set.
+      case 'lghtBttn':
+        document.getElementById(e.target.getAttribute("for")).classList.toggle("onBttn");
+      break;
       case 'setPgPrfl':
         chrome.storage.local.get({"settings":null}, (d)=>{
           chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
@@ -205,6 +190,12 @@ var act=null;
   });
 }
 
+
+//to be used with getCurHost below
+function wrtToEl(ps){
+  document.getElementById(ps.id).innerText=ps.host;
+}
+
 /*--------------------------------------
 pre: hostFromUrl()
 post: whatever cbFunc does
@@ -227,105 +218,43 @@ function getCurHost(fnc, fncPrms){
   });
 }
 
-  function strToHsh(str){
-    if(typeof str !="string"){
-    //console.log("not strin?");
-    return null;
-    }
-  var s=str;
-  var arr=s.trim().split("\n");
-  var rtrn={};
-  var max=arr.length;
-    for(let i=0; i<max; i++){
-    rtrn[arr[i]]=true;
-    }
-  return rtrn;
+//convert string to hash obj
+function strToHsh(str){
+  if(typeof str !="string"){
+  return null;
   }
-
-
-  //convert string to Apply List object
-  function strToApplyLst(str){
-    if(typeof str !="string"){
-    return null;
+var s=str;
+var arr=s.trim().split("\n");
+var rtrn={};
+var max=arr.length;
+  for(let i=0; i<max; i++){
+  let pos=arr[i].indexOf("|");
+    if(pos<=0){
+    rtrn[arr[i]]=null;
     }
-  var s=str;
-  var arr=s.trim().split("\n");
-  var rtrn={};
-  var max=arr.length;
-    for(let i=0; i<max; i++){
-    let pos=arr[i].indexOf("|");
+    else{
     rtrn[arr[i].substr(0,pos)]=arr[i].substr(pos+1);
     }
-  return rtrn;
   }
-
-  //populates domain div as well as the "buttons" to say if it's in the ignore or apply list
-  function populDmn(ps){
-  document.getElementById(ps.id).textContent=ps.host;
-  ignrHsh=strToHsh(ps.d.settings.ignrLst);
-  applyHsh=strToApplyLst(ps.d.settings.applyLst);
-    if(ignrHsh.hasOwnProperty(ps.host)){
-    document.getElementById(ps.ignrId).checked=true; 
-    }
-    if(applyHsh.hasOwnProperty(ps.host)){
-    document.getElementById(ps.applyId).checked=true; 
-    }
-
-  }
-
-
-  /*---------------------------------------------------
-  pre:
-  post:
-  returns which profile to use. this version is for 
-  popup only.
-
-  all actions by right click menu or popup menu needs to send the current/proper profile to the content script
-  ---------------------------------------------------*/
-  function dtrmnPrfl(cur, def, hst, hsh, mrk, prfls, curDef){
-
-    //if no profiles exist,do nothing. Nothing can be done.
-    if(Object.keys(hsh).length<=0 || Object.keys(prfls).length<=0){
-    return false;
-    }
-    
-    var curPrfl=null;
-
-    //else if applist domain profile marker exists and host in applyList, use cur,
-    if(mrk!=null){
-    curPrfl=cur;
-    }
-    //else if applylist domain profile marker doesn't exist but host in applyList, user applist prof.
-    else if(hsh.hasOwnProperty(hst)){
-    curPrfl=hsh[hst];
-    }
-    //all other conditions, use current or default based on choice
-    else{
-    curPrfl=curDef?cur:def;
-    }
-
-
-    //the below does sanity checks. Makes sure the profile actually exists.And, if it doesn't tries to find the best alternative
-    //if current profile (which can the default profile) doesn't exist, use the default profile
-    if(!prfls.hasOwnProperty(curPrfl)){
-    curPrfl=def;
-    }
-
-    //if the default profile doesn't exist, get the first available profile.
-    if(!prfls.hasOwnProperty(curPrfl)){
-    curPrfl=Object.keys(prfls[0]);
-    }
-  return curPrfl;
-  }
-
-function chromeSendMsgErrHndl(action, tabs){
-  if(chrome.runtime.lastError){
-  console.log("SARA: Received the following error: \n\n"+chrome.runtime.lastError.message+"\n\nTrying to send a \""+action+"\" to\ntab: "+tabs[0].id+"\ntitled: \""+tabs[0].title+"\"\nurl: \""+tabs[0].url+"\"");
-  }
+return rtrn;
 }
+
+function hshToStr(hsh){
+  if(typeof hsh!="object"){
+  return null;
+  }
+let rtrn="";
+  Object.keys(hsh).forEach((key)=>{
+  rtrn+="key"+"|"+hsh[key]+"\n";
+  });
+return rtrn;
+}
+
 
 function sttngsUpdtGUI(d){
 document.getElementById("rplChck").checked=d.on;
+document.getElementById("bLst").value=hshToStr(d.blackList);
+
 }
 
 //================================ main ==========================
@@ -338,10 +267,9 @@ var curPrfl=null;
 
 //variable checks
 chrome.storage.local.get( null,(d) => {
-console.log(d);  
 
 sttngsUpdtGUI(d);
-
+getCurHost(wrtToEl, {id:'curDmn'});
 
 /*
 var af=document.getElementById("atFllId");
