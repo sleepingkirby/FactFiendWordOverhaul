@@ -25,9 +25,40 @@ function runOnURL(url,on,wl,bl){
 return false;
 }
 
-//determins which 
+//determines which capitalization
 function whichCap(word){
-  
+let capLen=0;
+let capEnd=false;
+  for(let i; i<3; i++){
+    if(/\p{Lu}/u.test(word[i]){
+    capLen++;
+    }
+  }
+  if(/\p{Lu}/u.test(word[word.length-1])){
+  capEnd=true;
+  }
+  //no cap
+  if(capLen==0){
+  return "none";
+  }
+  if(capLen>1&&capEnd){
+  return "allcap";
+  }
+  return "firstcap";
+}
+
+
+function capWordToStyl(word, style){
+  switch(style){
+    case "allcap":
+    return word.toLocaleUpperCase();
+    case "firstcap":
+    return word[0].toLocaleUpperCase()+word.substr(1,word.length);
+    break;
+    default:
+    return word;
+    break;
+  }
 }
 
 /*----------------------------------------------
@@ -36,18 +67,19 @@ post: elements replaced
 goes through all the elements and runs the replace
 ----------------------------------------------*/
 function runReplace(allEls, words){
-    allObjs.forEach((el) => {
-    let txt=el.innerText;
-      if(txt){
-      //do replace.
-        Object.keys(sttngs.words).forEach((word) => {
-        //regex search
-        txt.replace
-        //determine case
-        //
+  allObjs.forEach((el) => {
+  let txt=el.innerText;
+    if(txt){
+    //do replace.
+      Object.keys(sttngs.words).forEach((word) => {
+      //regex search
+      const re=new RegExp(word, "gi");
+        txt.replace(re, (wrd) => {
+          return capWordToStyl(whichCap(wrd));
         });
-      }
-    }); 
+      });
+    }
+  }); 
 }
 
 /*----------------------------------------------
