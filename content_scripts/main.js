@@ -96,9 +96,14 @@ logic just gets the comments and replaces them
 ---------------------------------------------*/ 
 function ytCmmntsReplace(){
 //for some reason, the first of the item-section renderer is always the comment container despite the second one looking almost exactly the same
-const cmmntSect=document.getElementsByTagName("ytd-item-section-renderer")[0];
+const cmmntSect=document.getElementsByTagName("ytd-item-section-renderer");
+  if(cmmntSect.length<=0){
+  console.log("youtube comments not found");
+  return [];
+  }
+
 //youtube seems to wrap all strings in this yt-formatted-string
-const ytStrs=cmmntSect.getElementsByTagName("yt-formatted-string");
+const ytStrs=cmmntSect[0].getElementsByTagName("yt-formatted-string");
 //but, despite being the comments section, not all yt-formatted-string is a comment.
 const cmmnts=[];
   for(const ytStr of ytStrs){
@@ -114,11 +119,10 @@ pre: none
 post: elements replaced
 goes through all the elements and runs the replace
 ----------------------------------------------*/
-function contentReplace(allEls, words){
-let list={};
+function contentReplace(allEls, words, noTagList=false){
   for(const el of allEls){
   let txt=el.innerHTML;
-    if(tagList.hasOwnProperty(el.tagName.toLocaleLowerCase())&&txt){
+    if( (noTagList||tagList.hasOwnProperty(el.tagName.toLocaleLowerCase())) && txt ){
     //do replace.
       Object.keys(words).forEach((word) => {
       //regex search
@@ -135,13 +139,17 @@ let list={};
 }
 
 /*--------------------------------------------
+pre: contentReplace()
+post: replaces words
+a function to decide what type of replacement needs to be done
+thanks to youtube comments -_-
 ---------------------------------------------*/
 function runReplace(allEls, sttngs, dmn){
   let exceptionRules=sttngs.whitelist.hasOwnProperty(dmn)?sttngs.whitelist[dmn]:null;
   switch(exceptionRules){
     case "ytCmmntsReplace":
     const els=ytCmmntsReplace();
-    contentReplace(els, sttngs.words);    
+    contentReplace(els, sttngs.words, true);
     break;
     default:
     contentReplace(allEls, sttngs.words);
@@ -158,7 +166,7 @@ switch for what to run on message from popup
 function runOnMsg(request, sender, sendResponse){
   switch(request.action){
     case 'replace':
-      chrome.storage.local.get('words', (d) => {
+      chrome.storage.local.get(null, (d) => {
       console.log('FactFiendWordOverhaul: running manual replace');
       runReplace(document.all, d, window.location.host);
       sendResponse({msg: "Got it. Thank you."});
