@@ -11,6 +11,27 @@
   }
 window.hasRun = true;
 
+const tagList={
+'a': true,
+'article': true,
+'aside': true,
+'button': true,
+'div':true,
+'em': true,
+'figcaption': true,
+'footer': true,
+'h1': true,
+'h2': true,
+'h3': true,
+'h4': true,
+'label': true,
+'li': true,
+'link': true,
+'p': true,
+'span': true,
+'title': true
+}
+
 /*----------------------------------------------
 pre: none
 post: none
@@ -29,7 +50,7 @@ return false;
 function whichCap(word){
 let capLen=0;
 let capEnd=false;
-  for(let i; i<3; i++){
+  for(let i=0; i<3; i++){
     if(/\p{Lu}/u.test(word[i])){
     capLen++;
     }
@@ -67,19 +88,23 @@ post: elements replaced
 goes through all the elements and runs the replace
 ----------------------------------------------*/
 function runReplace(allEls, words){
-  allObjs.forEach((el) => {
-  let txt=el.innerText;
-    if(txt){
+let list={};
+  for(const el of allEls){
+  let txt=el.innerHTML;
+    if(tagList.hasOwnProperty(el.tagName.toLocaleLowerCase())&&txt){
     //do replace.
-      Object.keys(sttngs.words).forEach((word) => {
+      Object.keys(words).forEach((word) => {
       //regex search
-      const re=new RegExp(word, "gi");
-        txt.replace(re, (wrd) => {
-          return capWordToStyl(whichCap(wrd));
-        });
+        if(txt.includes(word)){
+        const re=new RegExp(word, "gi");
+          const newTxt=txt.replace(re, (wrd) => {
+          return capWordToStyl(words[word],whichCap(wrd));
+          });
+        el.innerHTML=newTxt;
+        }
       });
     }
-  }); 
+  }
 }
 
 /*----------------------------------------------
@@ -100,8 +125,31 @@ function runOnMsg(request, sender, sendResponse){
   }
 }
 
+/*--------------------------
+pre: none
+post: none
+new fangled wait function 
+https://stackoverflow.com/questions/951021/what-is-the-javascript-version-of-sleep
+---------------------------*/
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
+/*-----------------------
+pre: pageDone()
+post: none
+runs pageDone after "secs" amount of time
+-----------------------*/
+async function delayRun(secs=6500, allObjs, sttngs) {
+await sleep(secs);
+runReplace(allObjs,sttngs.words);
+}
+
+
 
 //main run
+console.log("================= FactFiend==========>>");
   chrome.storage.local.get(null, (d) => {
   let sttngs=d;
     if(Object.keys(d).length<=0){
@@ -122,7 +170,7 @@ function runOnMsg(request, sender, sendResponse){
 
   let dmn=window.location.host;
     //if false, don't run.
-    if(!runOnURL(dmn,settings.on,sttngs.whitelist,sttng,blacklist)){
+    if(!runOnURL(dmn,sttngs.on,sttngs.whitelist,sttngs.blacklist)){
     console.log("FactFiendWordOverhaul: not set to run");
     console.log("FactFiendWordOverhaul: set to run: "+sttngs.on);
     console.log("FactFiendWordOverhaul: domain in whitelist: "+sttngs.whilelist.hasOwnProperty(dmn));
@@ -130,11 +178,10 @@ function runOnMsg(request, sender, sendResponse){
     return false;
     }
 
-    let allObjs=document.all;
-
+  let allObjs=document.all;
 
   runReplace(allObjs,sttngs.words);
-  chrome.storage.local.clear();
+  delayRun(6500, allObjs, sttngs);
   });
 
   //listener for the popup signal

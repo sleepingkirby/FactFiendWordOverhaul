@@ -30,6 +30,17 @@ var end=rtrn.search('/');
 return rtrn;
 }
 
+//to be used with getCurHost
+function addDmnToLst(ps){
+ps.sttngObj[ps.prop]=null;
+  chrome.storage.local.get(null, (d)=>{
+  d[ps.prop][ps.host]=null;
+  console.log(d);
+    chrome.storage.local.set(d,(b)=>{
+    ps.updtFnc(d);
+    });
+  });
+}
 
 /*---------------------------------------------------------------------
 pre: none 
@@ -70,12 +81,12 @@ var act=null;
   });
   document.addEventListener("click", (e) => {
   const act=e.target.getAttribute("act");
+  const prop=e.target.getAttribute("prop");
+  const sttngObj={};
     switch(act){
       case "svTxtArea":
-        const el=e.target;
-        const sttngObj={};
-        const prop=e.target.getAttribute("prop");
-        const taVal=document.getElementById(e.target.getAttribute('txtArea')).value;
+        let el=e.target;
+        let taVal=document.getElementById(e.target.getAttribute('txtArea')).value;
         sttngObj[prop]=null;
           chrome.storage.local.get(sttngObj,(d)=>{
           d[prop]=strToHsh(taVal);
@@ -84,6 +95,20 @@ var act=null;
             el.classList.remove("onBttn");
             });
           });
+      break;
+      case 'addCurDmn':
+        //getting the current tab's domain can only be done through a promise. Will need it's own function
+        getCurHost(addDmnToLst, {prop:prop, sttngObj:sttngObj, updtFnc:sttngsUpdtGUI});
+      break;
+      case 'sndRplcMsg':
+        chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+            //send message to page to set profile
+            chrome.tabs.sendMessage(tabs[0].id, {action: 'replace'},(r)=>{
+            console.log(r);
+            });
+        });
+      break;
+      default:
       break;
     }
   });
@@ -101,88 +126,6 @@ var act=null;
       case 'lghtBttn':
         document.getElementById(e.target.getAttribute("for")).classList.toggle("onBttn");
       break;
-      case 'setPgPrfl':
-        chrome.storage.local.get({"settings":null}, (d)=>{
-          chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-            //send message to page to set profile
-            chrome.tabs.sendMessage(tabs[0].id, {action: 'setPgPrfl', msg:{val:e.target.value}},(r)=>{
-              if(r){
-              d.settings.cur_profile=e.target.value;
-              //send message to background to set the contextmenu for which profile to set up for user to paste from
-              chrome.runtime.sendMessage({'setPrfl':e.target.value});
-              chrome.storage.local.set(d);
-              }
-            });
-          });
-        });
-      break;
-      case 'addDmnIgnr':
-      dmn=document.getElementById("dmn");
-        chrome.storage.local.get({"settings":null}, (d)=>{
-          if(e.target.checked){
-            if(d.settings.ignrLst.trim()==""){
-            d.settings.ignrLst=dmn.textContent;
-            }
-            else{
-            d.settings.ignrLst+="\n"+dmn.textContent;
-            }
-          chrome.storage.local.set(d);
-          }
-          else{
-            if(d.settings.ignrLst.indexOf("\n"+dmn.textContent)>=0){
-            d.settings.ignrLst=d.settings.ignrLst.replace("\n"+dmn.textContent,"");
-            chrome.storage.local.set(d);
-            }
-            else if(d.settings.ignrLst.indexOf(dmn.textContent)>=0){
-            d.settings.ignrLst=d.settings.ignrLst.replace(dmn.textContent,"").trim();
-            chrome.storage.local.set(d);
-            }
-          }
-        });
-      break;
-      case 'addDmnApply':
-      prfl=document.getElementById("prflSlct");
-      dmn=document.getElementById("dmn");
-        chrome.storage.local.get({"settings":null}, (d)=>{
-        let aHsh=strToApplyLst(d.settings.applyLst);
-          if(e.target.checked){
-            if(d.settings.applyLst.trim()==""){
-            d.settings.applyLst=dmn.textContent+"|"+prfl.value;
-            }
-            else{
-            d.settings.applyLst+="\n"+dmn.textContent+"|"+prfl.value;
-            }
-          chrome.storage.local.set(d);
-          }
-          else{
-            if(!aHsh.hasOwnProperty(dmn.textContent)){
-            return false;
-            }
-            if(d.settings.applyLst.indexOf("\n"+dmn.textContent+"|"+aHsh[dmn.textContent])>=0){
-            d.settings.applyLst=d.settings.applyLst.replace("\n"+dmn.textContent+"|"+aHsh[dmn.textContent],"");
-            chrome.storage.local.set(d);
-            }
-            else if(d.settings.applyLst.indexOf(dmn.textContent+"|"+aHsh[dmn.textContent])>=0){
-            d.settings.applyLst=d.settings.applyLst.replace(dmn.textContent+"|"+aHsh[dmn.textContent],"").trim();
-            chrome.storage.local.set(d);
-            }
-          }
-        });
-      break;
-      case 'tglCurDef':
-        chrome.storage.local.get({"settings":null},(d)=>{
-        d.settings.curDef=document.getElementById("curDefId").checked;
-          if(!e.target.checked){
-          d.settings.cur_profile=d.settings.def_profile;
-          chrome.runtime.sendMessage({'setPrfl':d.settings.def_profile});
-          }
-        chrome.storage.local.set(d);
-        });
-      break;
-      case 'fPnl':
-          chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-            chrome.tabs.sendMessage(tabs[0].id, {action: 'fPnlTgl', msg:{val:e.target.checked}});
-          });
       default:
       console.log(e.target);
       break;
@@ -239,13 +182,18 @@ var max=arr.length;
 return rtrn;
 }
 
-function hshToStr(hsh){
+function hshToStr(hsh,valFlag=true){
   if(typeof hsh!="object"){
   return null;
   }
 let rtrn="";
   Object.keys(hsh).forEach((key)=>{
-  rtrn+="key"+"|"+hsh[key]+"\n";
+    if(valFlag){
+    rtrn+=key+"|"+hsh[key]+"\n";
+    }
+    else{
+    rtrn+=key+"\n";
+    }
   });
 return rtrn;
 }
@@ -253,62 +201,19 @@ return rtrn;
 
 function sttngsUpdtGUI(d){
 document.getElementById("rplChck").checked=d.on;
-document.getElementById("bLst").value=hshToStr(d.blackList);
+document.getElementById("bLst").value=hshToStr(d.blacklist, false);
+document.getElementById("wLst").value=hshToStr(d.whitelist, false);
+document.getElementById("wrdLst").value=hshToStr(d.words);
 
 }
 
 //================================ main ==========================
 var host=""
-/*
-var ignrHsh={};
-var applyHsh={};
-var curPrfl=null;
-*/
-
 //variable checks
 chrome.storage.local.get( null,(d) => {
 
 sttngsUpdtGUI(d);
 getCurHost(wrtToEl, {id:'curDmn'});
-
-/*
-var af=document.getElementById("atFllId");
-af.checked=d.settings.autoFill;
-
-var ef=document.getElementById("evntFllId");
-ef.checked=d.settings.eventFill;
-
-var hov=document.getElementById("hvrId");
-hov.checked=d.settings.hoverId;
-
-var hov=document.getElementById("fPnlId");
-hov.checked=d.settings.floatPnl;
-
-var curDef=document.getElementById("curDefId");
-curDef.checked=d.settings.curDef;
-*/
-
-//fill div with domain and the buttons that match
-//getCurHost(populDmn, {id:"dmn", ignrId:"dmnTypeIgnr", applyId:"dmnTypeApply", "d":d});
-
-/*
-  //figure out what profile to have in the profiles drop down as well as fill the drop down. 
-  chrome.tabs.query({active: true, currentWindow: true},(tabs) => {
-    if(tabs[0].url.indexOf("chrome")!=0){
-
-    let h=hostFromURL(tabs[0].url);
-    let aHsh=strToApplyLst(d.settings.applyLst);
-    
-      chrome.tabs.sendMessage(tabs[0].id, {action: 'getPgPrfl', msg:{}}, function(e){
-      chromeSendMsgErrHndl("getPgPrfl", tabs);
-      curPrfl=dtrmnPrfl(d.settings.cur_profile, d.settings.def_profile, h, aHsh, e, d.profiles, d.settings.curDef);
-
-      fillSlct("prflSlct", Object.keys(d.profiles),curPrfl); 
-      });
-    }
-  });
-*/
-
 
 startListen();
 });

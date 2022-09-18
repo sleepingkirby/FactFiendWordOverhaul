@@ -63,6 +63,8 @@ background-color: #000000;
 width: 100%;
 color: #888888;
 padding: 4px;
+font-size: small;
+min-height: 60px;
 }
 
 textarea::placeholder,input::placeholder{
