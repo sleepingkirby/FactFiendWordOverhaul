@@ -126,7 +126,6 @@ var act=null;
         });
       break;
       default:
-      console.log(e.target);
       break;
     }
   });
@@ -166,7 +165,8 @@ function strToHsh(str){
   return null;
   }
 var s=str;
-var arr=s.trim().split("\n");
+var arr=s?s.trim().split("\n"):[];
+console.log(arr);
 var rtrn={};
 var max=arr.length;
   for(let i=0; i<max; i++){
