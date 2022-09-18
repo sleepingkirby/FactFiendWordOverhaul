@@ -115,7 +115,7 @@ return cmmnts;
 }
 
 /*----------------------------------------------
-pre: none
+pre: global tagList variable
 post: elements replaced
 goes through all the elements and runs the replace
 ----------------------------------------------*/
@@ -126,8 +126,8 @@ function contentReplace(allEls, words, noTagList=false){
     //do replace.
       Object.keys(words).forEach((word) => {
       //regex search
-        if(txt.includes(word)){
-        const re=new RegExp(word, "gi");
+      const re=new RegExp(word, "gi");
+        if(txt.search(re)>=0){
           const newTxt=txt.replace(re, (wrd) => {
           return capWordToStyl(words[word],whichCap(wrd));
           });
