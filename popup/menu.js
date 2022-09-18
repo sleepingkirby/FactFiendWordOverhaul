@@ -58,15 +58,13 @@ var act=null;
       case 'About':
       chrome.tabs.create({url: 'https://www.patreon.com/untitledsidechannel'});
       break;
-      case 'replace':
+      case 'manualReplace':
       chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-        chrome.tabs.sendMessage(tabs[0].id, {action: 'fillForm', msg:{val:document.getElementById("prflSlct").value}});
-      });
-      /*
-        chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-        chrome.tabs.sendMessage(tabs[0].id, {action: 'disableMdl'});
+        chrome.tabs.sendMessage(tabs[0].id, {action: 'replace'}, function(response){
+        console.log(response);
+        return true;
         });
-      */
+      });
       break;
       default:
       break;

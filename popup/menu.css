@@ -64,7 +64,8 @@ width: 100%;
 color: #888888;
 padding: 4px;
 font-size: small;
-min-height: 60px;
+min-height: 70px;
+max-width: 750px;
 }
 
 textarea::placeholder,input::placeholder{
@@ -97,7 +98,7 @@ border-color:#ffffff;
 
 .pageWrap{
 width: 100%;
-min-width: 300px;
+min-width: 350px;
 flex-direction: column;
 justify-content: center;
 align-items: stretch;

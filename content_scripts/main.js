@@ -118,11 +118,14 @@ function runOnMsg(request, sender, sendResponse){
       chrome.storage.local.get('words', (d) => {
       console.log('FactFiendWordOverhaul: running manual replace');
       runReplace(document.all, d['words']);
+      sendResponse({msg: "Got it. Thank you."});
+      return true;
       });
     break;
     default:
     break;
   }
+return true;
 }
 
 /*--------------------------
@@ -149,7 +152,7 @@ runReplace(allObjs,sttngs.words);
 
 
 //main run
-console.log("================= FactFiend==========>>");
+console.log(">>>> Chrome Extension: FactFiendWordOverhaul is loaded.");
   chrome.storage.local.get(null, (d) => {
   let sttngs=d;
     if(Object.keys(d).length<=0){
