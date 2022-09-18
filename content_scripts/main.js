@@ -214,7 +214,9 @@ const dmn=window.location.host;
       const initObj={
       'on':true,
       'blacklist': {},
-      'whitelist': {},
+      'whitelist': {
+      'www.youtube.com':'ytCmmntsReplace'
+      },
       'words': {
         'woke': 'challenging norms',
         'quiet quitting': 'performing to your pay',
