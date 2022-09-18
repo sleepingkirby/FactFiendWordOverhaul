@@ -205,7 +205,7 @@ return rtrn.trim();
 function sttngsUpdtGUI(d){
 document.getElementById("rplChck").checked=d.on;
 document.getElementById("bLst").value=hshToStr(d.blacklist, false);
-document.getElementById("wLst").value=hshToStr(d.whitelist, false);
+document.getElementById("wLst").value=hshToStr(d.whitelist);
 document.getElementById("wrdLst").value=hshToStr(d.words);
 
 }

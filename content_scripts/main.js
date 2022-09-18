@@ -82,12 +82,39 @@ function capWordToStyl(word, style){
   }
 }
 
+/*---------------------------------------------
+pre:none
+post text replaced
+logic just for youtube comments replace. Because
+the youtube comment's code, not just the comments
+itself, is a mess. Just running el.innerHTML=el.innerHTML
+will mess it up. I don't know the exact reason
+why, but I don't need to at the moment. it's 
+innerHTML has binary in it, it probably has elements
+that can't survive reinstantiation. As such, this
+logic just gets the comments and replaces them
+---------------------------------------------*/ 
+function ytCmmntsReplace(){
+//for some reason, the first of the item-section renderer is always the comment container despite the second one looking almost exactly the same
+const cmmntSect=document.getElementsByTagName("ytd-item-section-renderer")[0];
+//youtube seems to wrap all strings in this yt-formatted-string
+const ytStrs=cmmntSect.getElementsByTagName("yt-formatted-string");
+//but, despite being the comments section, not all yt-formatted-string is a comment.
+const cmmnts=[];
+  for(const ytStr of ytStrs){
+    if(ytStr.hasAttribute("id") && ytStr.id=="content-text"){
+    cmmnts.push(ytStr);
+    }
+  }
+return cmmnts;
+}
+
 /*----------------------------------------------
 pre: none
 post: elements replaced
 goes through all the elements and runs the replace
 ----------------------------------------------*/
-function runReplace(allEls, words){
+function contentReplace(allEls, words){
 let list={};
   for(const el of allEls){
   let txt=el.innerHTML;
@@ -107,6 +134,22 @@ let list={};
   }
 }
 
+/*--------------------------------------------
+---------------------------------------------*/
+function runReplace(allEls, sttngs, dmn){
+  let exceptionRules=sttngs.whitelist.hasOwnProperty(dmn)?sttngs.whitelist[dmn]:null;
+  switch(exceptionRules){
+    case "ytCmmntsReplace":
+    const els=ytCmmntsReplace();
+    contentReplace(els, sttngs.words);    
+    break;
+    default:
+    contentReplace(allEls, sttngs.words);
+    break;
+  }
+}
+
+
 /*----------------------------------------------
 pre: none
 post: runReplace()
@@ -117,7 +160,7 @@ function runOnMsg(request, sender, sendResponse){
     case 'replace':
       chrome.storage.local.get('words', (d) => {
       console.log('FactFiendWordOverhaul: running manual replace');
-      runReplace(document.all, d['words']);
+      runReplace(document.all, d, window.location.host);
       sendResponse({msg: "Got it. Thank you."});
       return true;
       });
@@ -146,13 +189,15 @@ runs pageDone after "secs" amount of time
 -----------------------*/
 async function delayRun(secs=6500, allObjs, sttngs) {
 await sleep(secs);
-runReplace(allObjs,sttngs.words);
+console.log("FactFiendWordOverhaul: Delayed Run");
+runReplace(allObjs,sttngs, dmn);
 }
 
 
 
 //main run
 console.log(">>>> Chrome Extension: FactFiendWordOverhaul is loaded.");
+const dmn=window.location.host;
   chrome.storage.local.get(null, (d) => {
   let sttngs=d;
     if(Object.keys(d).length<=0){
@@ -173,20 +218,19 @@ console.log(">>>> Chrome Extension: FactFiendWordOverhaul is loaded.");
     chrome.storage.local.set(initObj);
     }
 
-  let dmn=window.location.host;
     //if false, don't run.
     if(!runOnURL(dmn,sttngs.on,sttngs.whitelist,sttngs.blacklist)){
     console.log("FactFiendWordOverhaul: not set to run");
     console.log("FactFiendWordOverhaul: set to run: "+sttngs.on);
-    console.log("FactFiendWordOverhaul: domain in whitelist: "+sttngs.whilelist.hasOwnProperty(dmn));
+    console.log("FactFiendWordOverhaul: domain in whitelist: "+sttngs.whitelist.hasOwnProperty(dmn));
     console.log("FactFiendWordOverhaul: domain in blacklist: "+sttngs.blacklist.hasOwnProperty(dmn));
     return false;
     }
 
   let allObjs=document.all;
 
-  runReplace(allObjs,sttngs.words);
-  delayRun(6500, allObjs, sttngs);
+  runReplace(allObjs, sttngs, dmn);
+  delayRun(6500, allObjs, sttngs, dmn);
   });
 
   //listener for the popup signal
