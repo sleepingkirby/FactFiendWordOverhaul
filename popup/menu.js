@@ -70,9 +70,12 @@ var act=null;
       break;
     }
   });
-  document.addEventListener("key", (e) => {
+  document.addEventListener("input", (e) => {
   const act=e.target.getAttribute("act");
     switch(act){
+      case 'lghtBttn':
+        document.getElementById(e.target.getAttribute("for")).classList.add("onBttn");
+      break;
       default:
       break;
     }
@@ -97,6 +100,7 @@ var act=null;
       case 'addCurDmn':
         //getting the current tab's domain can only be done through a promise. Will need it's own function
         getCurHost(addDmnToLst, {prop:prop, sttngObj:sttngObj, updtFnc:sttngsUpdtGUI});
+        document.getElementById(e.target.getAttribute("bttn")).classList.add("onBttn");
       break;
       case 'sndRplcMsg':
         chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
@@ -120,9 +124,6 @@ var act=null;
         d.on=document.getElementById("rplChck").checked;
         chrome.storage.local.set(d);
         });
-      break;
-      case 'lghtBttn':
-        document.getElementById(e.target.getAttribute("for")).classList.toggle("onBttn");
       break;
       default:
       console.log(e.target);
@@ -185,7 +186,11 @@ function hshToStr(hsh,valFlag=true){
   return null;
   }
 let rtrn="";
-  Object.keys(hsh).forEach((key)=>{
+const keys=Object.keys(hsh);
+  if(keys.length<=0){
+  return null;
+  }
+  keys.forEach((key)=>{
     if(valFlag){
     rtrn+=key+"|"+hsh[key]+"\n";
     }
@@ -193,7 +198,7 @@ let rtrn="";
     rtrn+=key+"\n";
     }
   });
-return rtrn;
+return rtrn.trim();
 }
 
 

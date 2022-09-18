@@ -164,7 +164,9 @@ console.log(">>>> Chrome Extension: FactFiendWordOverhaul is loaded.");
       'whitelist': {},
       'words': {
         'woke': 'challenging norms',
-        'quiet quitting': 'performing to your pay'
+        'quiet quitting': 'performing to your pay',
+        'cancel culture': 'consequence culture',
+        'culture war': 'repression of minorities'
         }
       }
     sttngs=initObj;

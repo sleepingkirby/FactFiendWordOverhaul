@@ -22,10 +22,10 @@
       <div class="cmmnts">(doesn't run when "Auto Replace" is on)</div>
     </div>
     <div class="row rowLft">
-      <textarea id="bLst" act="lghtBttn" for="bLstBttn"></textarea>
+      <textarea id="bLst" act="lghtBttn" for="bLstBttn" placeholder='use the "add current domain button" unless you know for sure what you want. Make sure to save.'></textarea>
     </div>
     <div class="row rowFll">
-      <button id="bLstAddBttn" act="addCurDmn" prop="blacklist">add current domain</button>
+      <button id="bLstAddBttn" act="addCurDmn" prop="blacklist" bttn="bLstBttn">add current domain</button>
       <button id="bLstBttn" act="svTxtArea" txtArea="bLst" prop="blacklist">save</button>
     </div>
 
@@ -35,10 +35,10 @@
       <div>(runs when "Auto Replace" is off)</div>
     </div>
     <div class="row rowLft">
-      <textarea id="wLst" act="lghtBttn" for="wLstBttn"></textarea>
+      <textarea id="wLst" act="lghtBttn" for="wLstBttn" placeholder='use the "add current domain button" unless you know for sure what you want. Make sure to save.'></textarea>
     </div>
     <div class="row rowFll">
-      <button id="wLstAddBttn" act="addCurDmn" prop="whitelist">add current domain</button>
+      <button id="wLstAddBttn" act="addCurDmn" prop="whitelist" bttn="wLstBttn">add current domain</button>
       <button id="wLstBttn" act="svTxtArea" txtArea="wLst" prop="whitelist">save</button>
     </div>
 
@@ -47,7 +47,7 @@
       <div class="lbl">word list</div>
     </div>
     <div class="row rowLft">
-      <textarea id="wrdLst" act="lghtBttn" for="wrdLstBttn"></textarea>
+      <textarea id="wrdLst" act="lghtBttn" for="wrdLstBttn" placeholder="woke|challenging norms"></textarea>
     </div>
     <div class="row rowRght">
       <button id="wrdLstBttn" act="svTxtArea" txtArea="wrdLst" prop="words">save</button>
