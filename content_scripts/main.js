@@ -82,6 +82,7 @@ function capWordToStyl(word, style){
   }
 }
 
+
 /*---------------------------------------------
 pre:none
 post text replaced
@@ -112,6 +113,22 @@ const cmmnts=[];
     }
   }
 return cmmnts;
+}
+
+
+//quick function to find youtube video title
+/*
+<yt-formatted-string force-default-style="" class="style-scope ytd-watch-metadata">Replacing The Term 'Test' | Karl's Corner Podcast</yt-formatted-string>
+*/
+function ytTtlReplace(){
+const els=document.getElementsByTagName("yt-formatted-string");
+const ttl=[];
+  for (const el of els) {
+    if (el.classList.contains("ytd-watch-metadata") && el.hasAttribute('force-default-style') && el.innerHTML===el.innerText){
+    ttl.push(el);
+    }
+  }
+return ttl;
 }
 
 /*----------------------------------------------
@@ -148,6 +165,8 @@ function runReplace(allEls, sttngs, dmn){
   let exceptionRules=sttngs.whitelist.hasOwnProperty(dmn)?sttngs.whitelist[dmn]:null;
   switch(exceptionRules){
     case "ytCmmntsReplace":
+    const ttlEls=ytTtlReplace();
+    contentReplace(ttlEls, sttngs.words, true);
     const els=ytCmmntsReplace();
     contentReplace(els, sttngs.words, true);
     break;
